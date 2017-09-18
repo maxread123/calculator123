@@ -1,0 +1,103 @@
+from socket import*
+import math
+import sys
+ 
+from math import *
+ 
+def validateSyntax(expression):
+  functions = {'__builtins__': None}
+  variables = {'__builtins__': None}
+ 
+  functions = {'acos': acos,
+               'asin': asin,
+               'atan': atan,
+               'atan2': atan2,
+               'ceil': ceil,
+               'cos': cos,
+               'cosh': cosh,
+               'degrees': degrees,
+               'exp': exp,
+               'fabs':fabs,
+               'floor': floor,
+               'fmod': fmod,
+               'frexp': frexp,
+               'hypot': hypot,
+               'ldexp': ldexp,
+               'log': log,
+               'log10': log10,
+               'modf': modf,
+               'pow': pow,
+               'radians': radians,
+               'sin': sin,
+               'sinh': sinh,
+               'sqrt': sqrt,
+               'tan': tan,
+               'tanh': tanh}
+ 
+  variables = {'e': e, 'pi': pi}
+ 
+  try:
+    eval(expression, variables, functions)
+  except (SyntaxError, NameError, ZeroDivisionError):
+    return False
+  else:
+    return True
+ 
+host = '192.168.1.36'
+port=3210
+ 
+ 
+s = socket(AF_INET, SOCK_STREAM)
+s.bind((host, port))
+s.listen(1)
+ 
+ 
+client_sock, client_adr=s.accept()
+print ('client ',client_adr,' is connect')
+ 
+while True:
+   
+  encodedMessage = client_sock.recv(1024)
+ 
+  message = encodedMessage.decode('UTF-8')
+   
+   
+  if validateSyntax(message) == True:
+      print ('get answer: ',message, 'is correct')
+      x = eval(message)
+      client_sock.send(str(x).encode('UTF-8'))
+       
+  elif message == '\exit' : 
+      x = "close program"
+      client_sock.send(str(x).encode('UTF-8'))
+      break
+  else: 
+      print ('get answer: ',message, 'is not correct')
+      x = "wrong input"
+      client_sock.send(str(x).encode('UTF-8'))
+      
+------------------------------------------------------------------------------------------------------
+
+import socket
+ 
+host = '192.168.1.36'
+port = 3210
+ 
+client_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+client_socket.connect((host,port))
+ 
+print('conect to calculator')
+ 
+ 
+while True:
+    msg = input('>> ')
+     
+    encodedMessage = msg.encode('UTF-8','strict')
+     
+    client_socket.send(encodedMessage)
+     
+    answer_server = client_socket.recv(1024)
+     
+    decodedResponse = answer_server.decode('UTF-8')
+    
+    print (decodedResponse)
